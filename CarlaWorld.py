@@ -51,6 +51,19 @@ class CarlaWorld:
         self.NPC = NPCClass()
         self.vehicles_list, _ = self.NPC.create_npcs(number_of_vehicles, number_of_walkers)
 
+    # added by yeshas
+    def put_segmentation_sensor(self, vehicle, sensor_width=640, sensor_height=480, fov=110):
+        bp = self.blueprint_library.find('sensor.camera.semantic_segmentation')
+        bp.set_attribute('image_size_x', f'{sensor_width}')
+        bp.set_attribute('image_size_y', f'{sensor_height}')
+        bp.set_attribute('fov', f'{fov}')
+
+        spawn_point = carla.Transform(carla.Location(x=self.camera_x_location, z=self.camera_z_location))
+        self.seg_camera = self.world.spawn_actor(bp, spawn_point, attach_to=vehicle)
+        self.sensors_list.append(self.seg_camera)
+
+        return self.seg_camera
+
     def put_rgb_sensor(self, vehicle, sensor_width=640, sensor_height=480, fov=110):
         # https://carla.readthedocs.io/en/latest/cameras_and_sensors/
         bp = self.blueprint_library.find('sensor.camera.rgb')
@@ -113,8 +126,15 @@ class CarlaWorld:
         img = np.array(img.raw_data)
         img = img.reshape((sensor_height, sensor_width, 4))
         img = img[:, :, :3]  # taking out opacity channel
-        bb = self.get_bb_data()
-        return img, bb
+        return img
+        
+        # bb = self.get_bb_data()
+        # return img, bb
+
+    def process_seg_img(self, img, sensor_width, sensor_height):
+        img = np.array(img.raw_data)
+        img = img.reshape((sensor_height, sensor_width, 1))
+        return img
 
     def remove_sensors(self):
         for sensor in self.sensors_list:
@@ -128,7 +148,8 @@ class CarlaWorld:
         ego_vehicle = random.choice([x for x in self.world.get_actors().filter("vehicle.*") if x.type_id not in
                                      ['vehicle.audi.tt', 'vehicle.carlamotors.carlacola', 'vehicle.volkswagen.t2']])
         self.put_rgb_sensor(ego_vehicle, sensor_width, sensor_height, fov)
-        self.put_depth_sensor(ego_vehicle, sensor_width, sensor_height, fov)
+        # self.put_depth_sensor(ego_vehicle, sensor_width, sensor_height, fov)
+        self.put_segmentation_sensor(ego_vehicle, sensor_width, sensor_height, fov)
 
         # Begin applying the sync mode
         with CarlaSyncMode(self.world, self.rgb_camera, self.depth_camera, fps=30) as sync_mode:
@@ -149,13 +170,15 @@ class CarlaWorld:
                     sync_mode.tick_no_data()
                     wait_frame_ticks += 1
 
-                _, rgb_data, depth_data = sync_mode.tick(timeout=2.0)  # If needed, self.frame can be obtained too
+                # _, rgb_data, depth_data = sync_mode.tick(timeout=2.0)  # If needed, self.frame can be obtained too
+                _, rgb_data, seg_data = sync_mode.tick(timeout=2.0)
                 # Processing raw data
-                rgb_array, bounding_box = self.process_rgb_img(rgb_data, sensor_width, sensor_height)
-                depth_array = self.process_depth_data(depth_data, sensor_width, sensor_height)
+                # rgb_array, bounding_box = self.process_rgb_img(rgb_data, sensor_width, sensor_height)
+                rgb_array = self.process_rgb_img(rgb_data, sensor_width, sensor_height)
+                seg_array = self.process_seg_img(seg_data, sensor_width, sensor_height)
                 ego_speed = ego_vehicle.get_velocity()
                 ego_speed = np.array([ego_speed.x, ego_speed.y, ego_speed.z])
-                bounding_box = apply_filters_to_3d_bb(bounding_box, depth_array, sensor_width, sensor_height)
+                # bounding_box = apply_filters_to_3d_bb(bounding_box, depth_array, sensor_width, sensor_height)
                 timestamp = round(time.time() * 1000.0)
 
                 # Saving into opened HDF5 dataset file

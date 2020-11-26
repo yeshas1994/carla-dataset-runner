@@ -64,7 +64,7 @@ if __name__ == "__main__":
     CarlaWorld = CarlaWorld(HDF5_file=HDF5_file)
 
     timestamps = []
-    egos_to_run = 13
+    egos_to_run = 1
     print('Starting to record data...')
     CarlaWorld.spawn_npcs(number_of_vehicles=args.vehicles, number_of_walkers=args.walkers)
     for weather_option in CarlaWorld.weather_options:
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         ego_vehicle_iteration = 0
         while ego_vehicle_iteration < egos_to_run:
             CarlaWorld.begin_data_acquisition(sensor_width, sensor_height, fov,
-                                             frames_to_record_one_ego=2, timestamps=timestamps,
+                                             frames_to_record_one_ego=1000, timestamps=timestamps,
                                              egos_to_run=egos_to_run)
             print('Setting another vehicle as EGO.')
             ego_vehicle_iteration += 1
@@ -84,5 +84,5 @@ if __name__ == "__main__":
     HDF5_file.close_HDF5()
 
     # For later visualization
-    if args.video:
-        create_video_sample(os.path.join('data', args.hdf5_file + ".hdf5"), show_depth=args.depth)
+    # if args.video:
+    #     create_video_sample(os.path.join('data', args.hdf5_file + ".hdf5"), show_depth=args.depth)
