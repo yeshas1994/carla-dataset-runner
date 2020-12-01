@@ -32,7 +32,7 @@ class HDF5Saver:
                                                     "(time.time()*1000 in python3)"
 
 
-    def record_data(self, rgb_array, depth_array, bounding_box, ego_speed, timestamp):
+    def record_data(self, rgb_array, seg_array, ego_speed, timestamp):
         timestamp = str(timestamp)
         self.rgb_group.create_dataset(timestamp, data=rgb_array)
         self.ego_speed_group.create_dataset(timestamp, data=ego_speed)
