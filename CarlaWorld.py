@@ -133,7 +133,7 @@ class CarlaWorld:
 
     def process_seg_img(self, img, sensor_width, sensor_height):
         img = np.array(img.raw_data)
-        img = img.reshape((sensor_height, sensor_width, 1))
+        img = img.reshape((sensor_height, sensor_width, 4))
         return img
 
     def remove_sensors(self):
