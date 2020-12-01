@@ -59,7 +59,7 @@ if __name__ == "__main__":
     fov = 90
     
     # Beginning data capture proccedure
-    HDF5_file = HDF5Saver(sensor_width, sensor_height, os.path.join("data", args.hdf5_file + ".hdf5"))
+    HDF5_file = HDF5Saver(sensor_width, sensor_height, os.path.join("/content/drive/MyDrive", args.hdf5_file + ".hdf5"))
     print("HDF5 File opened")
     CarlaWorld = CarlaWorld(HDF5_file=HDF5_file)
 
