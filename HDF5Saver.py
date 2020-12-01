@@ -26,8 +26,8 @@ class HDF5Saver:
         self.ego_speed_group.attrs['x,y,z_velocity'] = 'in m/s'
         # self.bounding_box_group.attrs['data_description'] = 'Each 4 entries in the same row present one individual actor in the scene.'
         # self.bounding_box_group.attrs['bbox_format'] = '[xmin, ymin, xmax, ymax] (top left coords; right bottom coords)' \
-                                                       'the vector has been flattened; therefore the data must' \
-                                                       'be captured in blocks of 4 elements'
+                                                       #'the vector has been flattened; therefore the data must' \
+                                                       #'be captured in blocks of 4 elements'
         self.timestamp_group.attrs['time_format'] = "current time in MILISSECONDS since the unix epoch " \
                                                     "(time.time()*1000 in python3)"
 

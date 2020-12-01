@@ -152,7 +152,7 @@ class CarlaWorld:
         self.put_segmentation_sensor(ego_vehicle, sensor_width, sensor_height, fov)
 
         # Begin applying the sync mode
-        with CarlaSyncMode(self.world, self.rgb_camera, self.depth_camera, fps=30) as sync_mode:
+        with CarlaSyncMode(self.world, self.rgb_camera, self.seg_camera, fps=30) as sync_mode:
             # Skip initial frames where the car is being put on the ambient
             if self.first_time_simulating:
                 for _ in range(30):
@@ -182,7 +182,7 @@ class CarlaWorld:
                 timestamp = round(time.time() * 1000.0)
 
                 # Saving into opened HDF5 dataset file
-                self.HDF5_file.record_data(rgb_array, depth_array, bounding_box, ego_speed, timestamp)
+                self.HDF5_file.record_data(rgb_array, seg_array, ego_speed, timestamp)
                 current_ego_recorded_frames += 1
                 self.total_recorded_frames += 1
                 timestamps.append(timestamp)
