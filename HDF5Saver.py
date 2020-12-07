@@ -12,6 +12,9 @@ class HDF5Saver:
         self.rgb_group = self.file.create_group("rgb")
         self.seg_group = self.file.create_group("seg")
         self.ego_speed_group = self.file.create_group("ego_speed")
+        self.ego_acc_group = self.file.create_group("ego_acc")
+        self.ego_ang_group = self.file.create_group("ego_angular")
+        self.ego_control_group = self.file.create_group("ego_control")
         # self.depth_group = self.file.create_group("depth")
         # self.bounding_box_group = self.file.create_group("bounding_box")
         # self.bb_vehicles_group = self.bounding_box_group.create_group("vehicles")
@@ -32,12 +35,16 @@ class HDF5Saver:
                                                     "(time.time()*1000 in python3)"
 
 
-    def record_data(self, rgb_array, seg_array, ego_speed, timestamp):
+    def record_data(self, rgb_array, seg_array, ego_speed, 
+                    ego_acc, ego_angular, ego_control, timestamp):
+
         timestamp = str(timestamp)
         self.rgb_group.create_dataset(timestamp, data=rgb_array)
         self.ego_speed_group.create_dataset(timestamp, data=ego_speed)
         self.seg_group.create_dataset(timestamp, data=seg_array)
-
+        self.ego_acc_group.create_dataset(timestamp, data=ego_acc)
+        self.ego_ang_group.create_dataset(timestamp, data=ego_angular)
+        self.ego_control_group.create_dataset(timestamp, data=ego_control)
     ''' 
     ---Below is the default func from repo---
     def record_data(self, rgb_array, depth_array, bounding_box, ego_speed, timestamp):

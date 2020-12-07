@@ -134,6 +134,7 @@ class CarlaWorld:
     def process_seg_img(self, img, sensor_width, sensor_height):
         img = np.array(img.raw_data)
         img = img.reshape((sensor_height, sensor_width, 4))
+        img = img[:, :, 2]
         return img
 
     def remove_sensors(self):
@@ -178,11 +179,17 @@ class CarlaWorld:
                 seg_array = self.process_seg_img(seg_data, sensor_width, sensor_height)
                 ego_speed = ego_vehicle.get_velocity()
                 ego_speed = np.array([ego_speed.x, ego_speed.y, ego_speed.z])
+                ego_acc = ego_vehicle.get_acceleration()
+                ego_acc = np.array([ego_acc.x, ego_acc.y, ego_acc.z])
+                ego_angular = ego_vehicle.get_angular_velocity()
+                ego_angular = np.array([ego_angular.x, ego_angular.y, ego_angular.z])
+                ego_control = ego_vehicle.get_control()
+                ego_control = np.array([ego_control.throttle, ego_control.steer, ego_control.brake])
                 # bounding_box = apply_filters_to_3d_bb(bounding_box, depth_array, sensor_width, sensor_height)
                 timestamp = round(time.time() * 1000.0)
 
                 # Saving into opened HDF5 dataset file
-                self.HDF5_file.record_data(rgb_array, seg_array, ego_speed, timestamp)
+                self.HDF5_file.record_data(rgb_array, seg_array, ego_speed, ego_acc, ego_angular, ego_control, timestamp)
                 current_ego_recorded_frames += 1
                 self.total_recorded_frames += 1
                 timestamps.append(timestamp)
