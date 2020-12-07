@@ -72,7 +72,7 @@ if __name__ == "__main__":
         ego_vehicle_iteration = 0
         while ego_vehicle_iteration < egos_to_run:
             CarlaWorld.begin_data_acquisition(sensor_width, sensor_height, fov,
-                                             frames_to_record_one_ego=10, timestamps=timestamps,
+                                             frames_to_record_one_ego=100, timestamps=timestamps,
                                              egos_to_run=egos_to_run)
             print('Setting another vehicle as EGO.')
             ego_vehicle_iteration += 1
